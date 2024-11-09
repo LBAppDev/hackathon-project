@@ -13,6 +13,11 @@ const subjectSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    current_session: {
+        type: Number,
+        default: 0 ,
+        required: true,
+    },
     sclassName: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'sclass',

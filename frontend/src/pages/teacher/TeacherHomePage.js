@@ -9,6 +9,7 @@ import Time from "../../assets/time.svg";
 import { getClassStudents, getSubjectDetails } from '../../redux/sclassRelated/sclassHandle';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
+import { CircularProgress } from '@mui/material';
 
 const TeacherHomePage = () => {
     const dispatch = useDispatch();
@@ -25,11 +26,12 @@ const TeacherHomePage = () => {
     }, [dispatch, subjectID, classID]);
 
     const numberOfStudents = sclassStudents && sclassStudents.length;
-    const numberOfSessions = subjectDetails && subjectDetails.sessions
+    const numberOfSessions = subjectDetails && subjectDetails.sessions;
+    const current_session = subjectDetails && subjectDetails.current_session;
 
     return (
         <>
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Container maxWidth="lg" sx={{ mt: 6, mb: 6 }}>
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={3} lg={3}>
                         <StyledPaper>
@@ -47,6 +49,27 @@ const TeacherHomePage = () => {
                                 Total Lessons
                             </Title>
                             <Data start={0} end={numberOfSessions} duration={5} />
+                        </StyledPaper>
+                    </Grid>
+                    <Grid item xs={12} md={3} lg={3}>
+                        <StyledPaper>
+                            <img src={Lessons} alt="current lesson" />
+                            <Title>
+                                current lessson
+                            </Title>
+                            <Data start={0} end={current_session} duration={5} />
+                        </StyledPaper>
+                    </Grid>
+                    <Grid item xs={12} md={3} lg={3}>
+                        <StyledPaper>
+                        <Title>Course Progress</Title>
+                        <CircularProgress 
+                        variant="determinate" 
+                        value={(current_session / numberOfSessions) * 100} 
+                        size={100} 
+                        thickness={4} 
+                        />
+                        <Title>{Math.round((current_session / numberOfSessions) * 100)}%</Title>
                         </StyledPaper>
                     </Grid>
                     <Grid item xs={12} md={3} lg={3}>

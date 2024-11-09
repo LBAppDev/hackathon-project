@@ -43,6 +43,12 @@ const TeacherSideBar = () => {
                     </ListItemIcon>
                     <ListItemText primary="Missed Sessions" />
                 </ListItem>
+                <ListItemButton component={Link} to="/Teacher/update-session">
+                    <ListItemIcon>
+                    <EventBusyIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Update Session" />
+                </ListItemButton>
             </React.Fragment>
             <Divider sx={{ my: 1 }} />
             <React.Fragment>

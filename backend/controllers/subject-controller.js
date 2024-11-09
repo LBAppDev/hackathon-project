@@ -1,6 +1,7 @@
 const Subject = require('../models/subjectSchema.js');
 const Teacher = require('../models/teacherSchema.js');
 const Student = require('../models/studentSchema.js');
+const mongoose = require('mongoose');
 
 const subjectCreate = async (req, res) => {
     try {
@@ -8,6 +9,7 @@ const subjectCreate = async (req, res) => {
             subName: subject.subName,
             subCode: subject.subCode,
             sessions: subject.sessions,
+            current_session: subject.current_session,
         }));
 
         const existingSubjectBySubCode = await Subject.findOne({
@@ -160,5 +162,29 @@ const deleteSubjectsByClass = async (req, res) => {
     }
 };
 
+const updateCurrentSession = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { current_session } = req.body;
 
-module.exports = { subjectCreate, freeSubjectList, classSubjects, getSubjectDetail, deleteSubjectsByClass, deleteSubjects, deleteSubject, allSubjects };
+        console.log("Received id:", id);
+        console.log("Received current_session:", current_session);
+
+        // Convert id to ObjectId if it's not already in the correct format
+        const numericId = parseInt(id, 10);
+        const subjectId = new mongoose.Types.ObjectId(numericId);
+        console.log("Converted subjectId:", numericId);
+        
+        const subject = await Subject.findOneAndUpdate({ subCode:numericId }, { current_session }, { new: true });
+
+        console.log("Updated subject:", subject);
+        res.status(200).json(subject);
+    } catch (error) {
+        console.error("Error updating session:", error);
+        res.status(500).json({ message: 'Error updating session', error });
+    }
+};
+
+
+
+module.exports = { subjectCreate, freeSubjectList, classSubjects, getSubjectDetail, deleteSubjectsByClass, deleteSubjects, deleteSubject, allSubjects, updateCurrentSession };
