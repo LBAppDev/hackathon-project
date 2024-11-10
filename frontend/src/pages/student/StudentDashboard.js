@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux'; // Add this import
+import { useSelector } from 'react-redux';
 import {
     CssBaseline,
     Box,
@@ -21,79 +21,64 @@ import StudentComplain from './StudentComplain';
 import Logout from '../Logout';
 import AccountMenu from '../../components/AccountMenu';
 import { AppBar, Drawer } from '../../components/styles';
-
 import MissedSessions from './MissedSessions.js';
 
 const StudentDashboard = () => {
     const [open, setOpen] = useState(true);
-    const toggleDrawer = () => {
-        setOpen(!open);
-    };
+    const toggleDrawer = () => setOpen(!open);
 
-    // Get the current student ID from the Redux store
-    const currentStudentId = useSelector(state => state.user.studentId); // Adjust according to your store structure
+    const currentStudentId = useSelector(state => state.user.studentId);
 
     return (
-        <>
-            <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <AppBar style={{backgroundColor: '#4aa037'}} open={open} position='absolute'>
-                    <Toolbar sx={{ pr: '24px' }}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={toggleDrawer}
-                            sx={{
-                                marginRight: '36px',
-                                ...(open && { display: 'none' }),
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography
-                            component="h1"
-                            variant="h6"
-                            color="inherit"
-                            noWrap
-                            sx={{ flexGrow: 1 }}
-                        >
-                            Student Dashboard
-                        </Typography>
-                        <AccountMenu />
-                    </Toolbar>
-                </AppBar>
-                <Drawer variant="permanent" open={open} sx={open ? styles.drawerStyled : styles.hideDrawer}>
-                    <Toolbar sx={styles.toolBarStyled}>
-                        <IconButton onClick={toggleDrawer}>
-                            <ChevronLeftIcon />
-                        </IconButton>
-                    </Toolbar>
-                    <Divider />
-                    <List component="nav">
-                        <StudentSideBar />
-                    </List>
-                </Drawer>
-                <Box component="main" sx={styles.boxStyled}>
-                    <Toolbar />
-                    <Routes>
-                        <Route path="/" element={<StudentHomePage />} />
-                        <Route path='*' element={<Navigate to="/" />} />
-                        <Route path="/Student/dashboard" element={<StudentHomePage />} />
-                        <Route path="/Student/profile" element={<StudentProfile />} />
-                        <Route path="/Student/subjects" element={<StudentSubjects />} />
-                        <Route path="/Student/attendance" element={<ViewStdAttendance />} />
-                        <Route path="/Student/complain" element={<StudentComplain />} />
-                        <Route path="/Student/missed-sessions" element={<MissedSessions userRole="student" studentId={currentStudentId} />} />
-                        <Route path="/logout" element={<Logout />} />
-                    </Routes>
-                </Box>
+        <Box sx={{ display: 'flex' }}>
+            <CssBaseline />
+            <AppBar open={open} position="absolute">
+                <Toolbar sx={{ pr: '24px' }}>
+                    <IconButton
+                        edge="start"
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={toggleDrawer}
+                        sx={{ marginRight: '36px', ...(open && { display: 'none' }) }}
+                    >
+                        <MenuIcon />
+                    </IconButton>
+                    <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
+                        Student Dashboard
+                    </Typography>
+                    <AccountMenu />
+                </Toolbar>
+            </AppBar>
+            <Drawer variant="permanent" open={open} sx={open ? styles.drawerStyled : styles.hideDrawer}>
+                <Toolbar sx={styles.toolBarStyled}>
+                    <IconButton onClick={toggleDrawer}>
+                        <ChevronLeftIcon />
+                    </IconButton>
+                </Toolbar>
+                <Divider />
+                <List component="nav">
+                    <StudentSideBar />
+                </List>
+            </Drawer>
+            <Box component="main" sx={styles.boxStyled}>
+                <Toolbar />
+                <Routes>
+                    <Route path="/" element={<StudentHomePage />} />
+                    <Route path="*" element={<Navigate to="/" />} />
+                    <Route path="/Student/dashboard" element={<StudentHomePage />} />
+                    <Route path="/Student/profile" element={<StudentProfile />} />
+                    <Route path="/Student/subjects" element={<StudentSubjects />} />
+                    <Route path="/Student/attendance" element={<ViewStdAttendance />} />
+                    <Route path="/Student/complain" element={<StudentComplain />} />
+                    <Route path="/Student/missed-sessions" element={<MissedSessions userRole="student" studentId={currentStudentId} />} />
+                    <Route path="/logout" element={<Logout />} />
+                </Routes>
             </Box>
-        </>
+        </Box>
     );
-}
+};
 
-export default StudentDashboard
+export default StudentDashboard;
 
 const styles = {
     boxStyled: {
@@ -112,7 +97,7 @@ const styles = {
         px: [1],
     },
     drawerStyled: {
-        display: "flex"
+        display: "flex",
     },
     hideDrawer: {
         display: 'flex',
@@ -120,4 +105,4 @@ const styles = {
             display: 'none',
         },
     },
-}
+};

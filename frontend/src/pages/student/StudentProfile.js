@@ -1,106 +1,113 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import { Container, Grid, Paper, Typography } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { calculateOverallAttendancePercentage } from '../../components/attendanceCalculator';
+import CustomPieChart from '../../components/CustomPieChart';
+import { getUserDetails } from '../../redux/userRelated/userHandle';
 import styled from 'styled-components';
-import { Card, CardContent, Typography, Grid, Box, Avatar, Container, Paper } from '@mui/material';
-import { useSelector } from 'react-redux';
+import SeeNotice from '../../components/SeeNotice';
+import CountUp from 'react-countup';
+import SubjectIcon from "../../assets/subjects.svg";
+import AssignmentIcon from "../../assets/assignment.svg";
+import { getSubjectList } from '../../redux/sclassRelated/sclassHandle';
 
-const StudentProfile = () => {
-  const { currentUser, response, error } = useSelector((state) => state.user);
+const StudentHomePage = () => {
+    const dispatch = useDispatch();
+    const { userDetails, currentUser, loading, response } = useSelector(state => state.user);
+    const { subjectsList } = useSelector(state => state.sclass);
+    const [subjectAttendance, setSubjectAttendance] = useState([]);
 
-  if (response) { console.log(response) }
-  else if (error) { console.log(error) }
+    const classID = currentUser.sclassName._id;
+    const numberOfSubjects = subjectsList?.length || 0;
+    const overallAttendancePercentage = calculateOverallAttendancePercentage(subjectAttendance);
+    const overallAbsentPercentage = 100 - overallAttendancePercentage;
 
-  const sclassName = currentUser.sclassName
-  const studentSchool = currentUser.school
+    const chartData = [
+        { name: 'Present', value: overallAttendancePercentage },
+        { name: 'Absent', value: overallAbsentPercentage }
+    ];
 
-  return (
-    <>
-      <Container maxWidth="md">
-        <StyledPaper elevation={3}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Box display="flex" justifyContent="center">
-                <Avatar alt="Student Avatar" sx={{ width: 150, height: 150 }}>
-                  {String(currentUser.name).charAt(0)}
-                </Avatar>
-              </Box>
+    useEffect(() => {
+        dispatch(getUserDetails(currentUser._id, "Student"));
+        dispatch(getSubjectList(classID, "ClassSubjects"));
+    }, [dispatch, currentUser._id, classID]);
+
+    useEffect(() => {
+        setSubjectAttendance(userDetails?.attendance || []);
+    }, [userDetails]);
+
+    return (
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={3}>
+                    <StyledPaper>
+                        <img src={SubjectIcon} alt="Subjects" />
+                        <Title>Total Subjects</Title>
+                        <Data start={0} end={numberOfSubjects} duration={2.5} />
+                    </StyledPaper>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                    <StyledPaper>
+                        <img src={AssignmentIcon} alt="Assignments" />
+                        <Title>Total Assignments</Title>
+                        <Data start={0} end={15} duration={4} />
+                    </StyledPaper>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                    <ChartContainer>
+                        {response ? (
+                            <Typography variant="h6">No Attendance Found</Typography>
+                        ) : (
+                            loading ? (
+                                <Typography variant="h6">Loading...</Typography>
+                            ) : (
+                                subjectAttendance?.length > 0 ? (
+                                    <CustomPieChart data={chartData} />
+                                ) : (
+                                    <Typography variant="h6">No Attendance Found</Typography>
+                                )
+                            )
+                        )}
+                    </ChartContainer>
+                </Grid>
+                <Grid item xs={12}>
+                    <StyledPaper flexDirection="column">
+                        <SeeNotice />
+                    </StyledPaper>
+                </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <Box display="flex" justifyContent="center">
-                <Typography variant="h5" component="h2" textAlign="center">
-                  {currentUser.name}
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Box display="flex" justifyContent="center">
-                <Typography variant="subtitle1" component="p" textAlign="center">
-                  Student Roll No: {currentUser.rollNum}
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Box display="flex" justifyContent="center">
-                <Typography variant="subtitle1" component="p" textAlign="center">
-                  Class: {sclassName.sclassName}
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Box display="flex" justifyContent="center">
-                <Typography variant="subtitle1" component="p" textAlign="center">
-                  School: {studentSchool.schoolName}
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </StyledPaper>
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Personal Information
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle1" component="p">
-                  <strong>Date of Birth:</strong> January 1, 2000
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle1" component="p">
-                  <strong>Gender:</strong> Male
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle1" component="p">
-                  <strong>Email:</strong> john.doe@example.com
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle1" component="p">
-                  <strong>Phone:</strong> (123) 456-7890
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle1" component="p">
-                  <strong>Address:</strong> 123 Main Street, City, Country
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle1" component="p">
-                  <strong>Emergency Contact:</strong> (987) 654-3210
-                </Typography>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-      </Container>
-    </>
-  )
+        </Container>
+    );
 }
 
-export default StudentProfile
+const baseContainerStyle = `
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+`;
+
+const ChartContainer = styled.div`
+  ${baseContainerStyle}
+  padding: 2px;
+  height: 240px;
+`;
 
 const StyledPaper = styled(Paper)`
-  padding: 20px;
-  margin-bottom: 20px;
+  ${baseContainerStyle}
+  padding: 16px;
+  height: 200px;
+  justify-content: space-between;
 `;
+
+const Title = styled.p`
+  font-size: 1.25rem;
+`;
+
+const Data = styled(CountUp)`
+  font-size: calc(1.3rem + 0.6vw);
+  color: green;
+`;
+
+export default StudentHomePage;
