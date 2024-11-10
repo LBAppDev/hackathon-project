@@ -25,6 +25,7 @@ import TeacherViewStudent from './TeacherViewStudent';
 import StudentExamMarks from '../admin/studentRelated/StudentExamMarks';
 import MissedSessions from './MissedSessions.js';
 import SessionUpdater from './SessionUpdater';
+import TeacherTakeAttendance from './TeacherTakeAttendance';
 
 const TeacherDashboard = () => {
     const [open, setOpen] = useState(true);
@@ -90,6 +91,8 @@ const TeacherDashboard = () => {
                         <Route path="/Teacher/class/student/marks/:studentID/:subjectID" element={<StudentExamMarks situation="Subject" />} />
                         <Route path="/Teacher/missed-sessions" element={<MissedSessions userRole="teacher" />} />
                         <Route path="/Teacher/update-session" element={<SessionUpdater />} />
+                        <Route path="/Teacher/attendance" element={<TeacherTakeAttendance />} />
+
 
                         <Route path="/logout" element={<Logout />} />
                     </Routes>

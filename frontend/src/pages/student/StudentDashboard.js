@@ -23,6 +23,7 @@ import AccountMenu from '../../components/AccountMenu';
 import { AppBar, Drawer } from '../../components/styles';
 
 import MissedSessions from './MissedSessions.js';
+import TakeAttendance from './TakeAttendance';
 
 const StudentDashboard = () => {
     const [open, setOpen] = useState(true);
@@ -85,6 +86,7 @@ const StudentDashboard = () => {
                         <Route path="/Student/attendance" element={<ViewStdAttendance />} />
                         <Route path="/Student/complain" element={<StudentComplain />} />
                         <Route path="/Student/missed-sessions" element={<MissedSessions userRole="student" studentId={currentStudentId} />} />
+                        <Route path="/Student/take-attendance" element={<TakeAttendance />} />
                         <Route path="/logout" element={<Logout />} />
                     </Routes>
                 </Box>

@@ -46,6 +46,12 @@ const StudentSideBar = () => {
                     </ListItemIcon>
                 <ListItemText primary="Missed Sessions" />
                 </ListItem>
+                <ListItemButton component={Link} to="/Student/take-attendance">
+                    <ListItemIcon>
+                        <EventBusyIcon color={location.pathname.startsWith("/Student/take-attendance") ? 'primary' : 'inherit'} />
+                    </ListItemIcon>
+                    <ListItemText primary="Take Attendance" />
+                </ListItemButton>
             </React.Fragment>
             <Divider sx={{ my: 1 }} />
             <React.Fragment>

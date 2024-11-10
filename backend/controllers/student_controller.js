@@ -52,6 +52,7 @@ const studentLogIn = async (req, res) => {
             res.send({ message: "Student not found" });
         }
     } catch (err) {
+        console.error('Error:', err);
         res.status(500).json(err);
     }
 };

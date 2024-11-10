@@ -37,7 +37,7 @@ const LoginPage = ({ role }) => {
             const rollNum = event.target.rollNumber.value;
             const studentName = event.target.studentName.value;
             const password = event.target.password.value;
-
+            
             if (!rollNum || !studentName || !password) {
                 if (!rollNum) setRollNumberError(true);
                 if (!studentName) setStudentNameError(true);
@@ -45,6 +45,7 @@ const LoginPage = ({ role }) => {
                 return;
             }
             const fields = { rollNum, studentName, password }
+            console.error('Error:');
             setLoader(true)
             dispatch(loginUser(fields, role))
         }
