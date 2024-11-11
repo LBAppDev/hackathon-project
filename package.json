@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "html5-qrcode": "^2.3.8",
+    "http-proxy-middleware": "^3.0.3",
+    "jwt-decode": "^4.0.0",
+    "react-qr-reader": "^3.0.0-beta-1",
+    "react-qr-scanner": "^1.0.0-alpha.11"
+  },
+  "proxy": "http://192.168.228.148:5000"
+}

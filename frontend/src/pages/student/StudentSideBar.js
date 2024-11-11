@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Divider, ListItemButton, ListItemIcon, ListItemText, ListSubheader, ListItem } from '@mui/material';
+import { Divider, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 import HomeIcon from '@mui/icons-material/Home';
@@ -28,12 +28,8 @@ const StudentSideBar = () => {
             <SidebarItem to="/Student/subjects" icon={AssignmentIcon} label="Subjects" />
             <SidebarItem to="/Student/attendance" icon={ClassOutlinedIcon} label="Attendance" />
             <SidebarItem to="/Student/complain" icon={AnnouncementOutlinedIcon} label="Complain" />
-            <ListItem button component={Link} to="/Student/missed-sessions">
-                <ListItemIcon>
-                    <EventBusyIcon />
-                </ListItemIcon>
-                <ListItemText primary="Missed Sessions" />
-            </ListItem>
+            <SidebarItem to="/Student/missed-sessions" icon={EventBusyIcon} label="Missed Sessions" />
+            <SidebarItem to="/Student/take-attendance" icon={EventBusyIcon} label="Take Attendance" />
             <Divider sx={{ my: 1 }} />
             <ListSubheader component="div" inset>User</ListSubheader>
             <SidebarItem to="/Student/profile" icon={AccountCircleOutlinedIcon} label="Profile" />

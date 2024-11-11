@@ -170,6 +170,81 @@ router.post('/recover-session/:sessionId', async (req, res) => {
 });
 
 
+// Example database model for student attendance (use your actual database schema)
+const Student = require('../models/studentSchema.js');
+const Subject = require('../models/subjectSchema.js');
+
+// Route to verify attendance
+router.post('/verifyAttendance', async (req, res) => {
+    const { sessionID, studentID } = req.body;
+  
+    // Fetch the student and session
+    const student = await Student.findOne({ rollNum: studentID });
+    
+    const session = await AttendanceSession.findOne({ code: sessionID });
+  
+    if (!student) {
+      return res.status(400).send({ message: 'Student not found.' });
+    }
+  
+    if (!session) {
+      return res.status(400).send({ message: 'Session not found.' });
+    }
+  
+    // Check if the student has already been marked present for this session
+    
+    const studentsession = await AttendanceSession.findById(student.attendanceSession);
+    
+    if (student.attendanceMarked && studentsession && studentsession.code === session.code) {
+        console.log("already marked");
+      //return res.status(400).send({ message: 'Attendance already marked for this session.' });
+      res.send({ verified: false, message: 'Attendance marked as present already!.' });
+    }else{
+        const session2 = await AttendanceSession.findOne().sort({ createdAt: -1 });
+        console.log(session2.code);
+    if(session2.code===sessionID)
+    {
+        const subject = await Subject.findOne({ subCode: session2.subCode });
+        const name = subject.subName;
+        student.attendanceMarked = true;
+        student.attendanceSession = session._id;  // Store session ID to avoid duplicate attendance
+        student.attendance.push({
+            date: new Date(),
+            status: 'Present', // or 'Absent' based on attendance
+            subName: subject._id // This should be the subject ID from the session
+          }); // Add attendance record to student's attendance array
+        await student.save();
+      
+        res.send({ verified: true, message: 'Attendance marked as present.' });
+    }else{
+        res.send({ verified: false, message: 'Attendance code is incorrect.' });
+    }
+    
+    }
+  });
+
+const AttendanceSession = require('../models/AttendanceSession');
+
+// Function to get the latest teacher attendance code
+async function getTeacherAttendanceCode() {
+  const session = await AttendanceSession.findOne().sort({ createdAt: -1 });
+  return session ? session.code : null;
+}
+
+
+router.post('/attendanceSessions', async (req, res) => {
+  try {
+    
+    const { code, subCode } = req.body;
+    console.log(code)
+    console.log(subCode);
+    const newSession = new AttendanceSession({ code, subCode });
+    await newSession.save();
+    res.status(201).send({ message: 'Attendance session created.' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error creating session.' });
+  }
+});
 
 
 module.exports = router;
