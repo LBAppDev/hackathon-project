@@ -36,6 +36,7 @@ export const DarkRedButton = styled(Button)`
 
 export const BlueButton = styled(Button)`
   ${buttonBase}
+  margin: 8px;
   background-color: #080a43;
   &:hover {
     background-color: #0a1e82;
