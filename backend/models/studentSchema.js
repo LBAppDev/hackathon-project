@@ -27,6 +27,10 @@ const studentSchema = new mongoose.Schema({
         type: String,
         default: "Student"
     },
+    attendanceMarked: { type: Boolean, default: false }, // New field for marking attendance
+
+    attendanceSession: { type: mongoose.Schema.Types.ObjectId, ref: 'AttendanceSession' },
+    
     examResult: [
         {
             subName: {

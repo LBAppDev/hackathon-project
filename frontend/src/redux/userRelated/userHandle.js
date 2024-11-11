@@ -15,13 +15,12 @@ import {
 
 
 export const loginUser = (fields, role) => async (dispatch) => {
-    console.log("me me me ",process.env.REACT_APP_BACKEND_URL);
     dispatch(authRequest());
 
     try {
         console.log("me me me ",process.env.REACT_APP_BACKEND_URL);
-        //const result = await axios.post(`${process.env.REACT_APP_BASE_URL}/${role}Login`, fields, {
-        const result = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/${role}Login`, fields, {
+        const result = await axios.post(`${process.env.REACT_APP_BASE_URL}/${role}Login`, fields, {
+        //const result = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/${role}Login`, fields, {
             headers: { 'Content-Type': 'application/json' },
         });
         if (result.data.role) {
