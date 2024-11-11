@@ -53,8 +53,9 @@ const StudentHomePage = () => {
                         <Data start={0} end={15} duration={4} />
                     </StyledPaper>
                 </Grid>
-                <Grid item xs={12} md={4}>
-                    <ChartContainer>
+                <Grid item xs={12} md={3}>
+                    <StyledPaper>
+                        <Typography variant="h6">Progress</Typography> {/* Added title for the pie chart */}
                         {response ? (
                             <Typography variant="h6">No Attendance Found</Typography>
                         ) : (
@@ -62,18 +63,20 @@ const StudentHomePage = () => {
                                 <Typography variant="h6">Loading...</Typography>
                             ) : (
                                 subjectAttendance?.length > 0 ? (
-                                    <CustomPieChart data={chartData} />
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <CustomPieChart data={chartData} />
+                                    </div>
                                 ) : (
                                     <Typography variant="h6">No Attendance Found</Typography>
                                 )
                             )
                         )}
-                    </ChartContainer>
+                    </StyledPaper>
                 </Grid>
                 <Grid item xs={12}>
-                    <StyledPaper flexDirection="column">
+                    <DynamicHeightPaper>
                         <SeeNotice />
-                    </StyledPaper>
+                    </DynamicHeightPaper>
                 </Grid>
             </Grid>
         </Container>
@@ -88,17 +91,18 @@ const baseContainerStyle = `
   text-align: center;
 `;
 
-const ChartContainer = styled.div`
-  ${baseContainerStyle}
-  padding: 2px;
-  height: 240px;
-`;
-
 const StyledPaper = styled(Paper)`
   ${baseContainerStyle}
   padding: 16px;
   height: 200px;
-  justify-content: space-between;
+  box-sizing: border-box;
+`;
+
+const DynamicHeightPaper = styled(Paper)`
+  ${baseContainerStyle}
+  padding: 16px;
+  box-sizing: border-box;
+  height: auto; /* Makes the notice table card height dynamic */
 `;
 
 const Title = styled.p`
