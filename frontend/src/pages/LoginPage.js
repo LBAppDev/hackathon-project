@@ -4,24 +4,38 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Grid, Box, Typography, Paper, Checkbox, FormControlLabel, TextField, CssBaseline, IconButton, InputAdornment, CircularProgress, Backdrop } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import bgpic from "../assets/designlogin.jpg"
-import { LightPurpleButton } from '../components/buttonStyles';
+import bgpic from "../assets/designlogin.png";
 import styled from 'styled-components';
 import { loginUser } from '../redux/userRelated/userHandle';
 import Popup from '../components/Popup';
 
-const defaultTheme = createTheme();
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#007bff',
+        },
+    },
+    typography: {
+        fontFamily: 'Poppins, sans-serif',
+        h4: {
+            fontWeight: 700,
+            color: '#333',
+        },
+        body1: {
+            color: '#555',
+        },
+    },
+});
 
 const LoginPage = ({ role }) => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
+    const { status, currentUser, response, error, currentRole } = useSelector(state => state.user);
 
-    const { status, currentUser, response, error, currentRole } = useSelector(state => state.user);;
-
-    const [toggle, setToggle] = useState(false)
-    const [guestLoader, setGuestLoader] = useState(false)
-    const [loader, setLoader] = useState(false)
+    const [toggle, setToggle] = useState(false);
+    const [guestLoader, setGuestLoader] = useState(false);
+    const [loader, setLoader] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -32,27 +46,24 @@ const LoginPage = ({ role }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        const password = event.target.password.value;
 
         if (role === "Student") {
             const rollNum = event.target.rollNumber.value;
             const studentName = event.target.studentName.value;
-            const password = event.target.password.value;
-            
+
             if (!rollNum || !studentName || !password) {
                 if (!rollNum) setRollNumberError(true);
                 if (!studentName) setStudentNameError(true);
                 if (!password) setPasswordError(true);
                 return;
             }
-            const fields = { rollNum, studentName, password }
-            console.error('Error:');
-            setLoader(true)
-            dispatch(loginUser(fields, role))
-        }
 
-        else {
+            const fields = { rollNum, studentName, password };
+            setLoader(true);
+            dispatch(loginUser(fields, role));
+        } else {
             const email = event.target.email.value;
-            const password = event.target.password.value;
 
             if (!email || !password) {
                 if (!email) setEmailError(true);
@@ -60,199 +71,133 @@ const LoginPage = ({ role }) => {
                 return;
             }
 
-            const fields = { email, password }
-            setLoader(true)
-            dispatch(loginUser(fields, role))
+            const fields = { email, password };
+            setLoader(true);
+            dispatch(loginUser(fields, role));
         }
-    };
-
-    const handleInputChange = (event) => {
-        const { name } = event.target;
-        if (name === 'email') setEmailError(false);
-        if (name === 'password') setPasswordError(false);
-        if (name === 'rollNumber') setRollNumberError(false);
-        if (name === 'studentName') setStudentNameError(false);
     };
 
     const guestModeHandler = () => {
-        const password = "zxc"
-
-        if (role === "Admin") {
-            const email = "yogendra@12"
-            const fields = { email, password }
-            setGuestLoader(true)
-            dispatch(loginUser(fields, role))
-        }
-        else if (role === "Student") {
-            const rollNum = "1"
-            const studentName = "Dipesh Awasthi"
-            const fields = { rollNum, studentName, password }
-            setGuestLoader(true)
-            dispatch(loginUser(fields, role))
-        }
-        else if (role === "Teacher") {
-            const email = "tony@12"
-            const fields = { email, password }
-            setGuestLoader(true)
-            dispatch(loginUser(fields, role))
-        }
-    }
+        const password = "zxc";
+        const fields = role === "Student" 
+            ? { rollNum: "1", studentName: "Dipesh Awasthi", password }
+            : { email: role === "Admin" ? "yogendra@12" : "tony@12", password };
+        
+        setGuestLoader(true);
+        dispatch(loginUser(fields, role));
+    };
 
     useEffect(() => {
-        if (status === 'success' || currentUser !== null) {
-            if (currentRole === 'Admin') {
-                navigate('/Admin/dashboard');
-            }
-            else if (currentRole === 'Student') {
-                navigate('/Student/dashboard');
-            } else if (currentRole === 'Teacher') {
-                navigate('/Teacher/dashboard');
-            }
+        if (status === 'success' || currentUser) {
+            const dashboardPath = `/${currentRole}/dashboard`;
+            navigate(dashboardPath);
+        } else if (status === 'failed' || status === 'error') {
+            setMessage(status === 'error' ? "Network Error" : response);
+            setShowPopup(true);
+            setLoader(false);
+            setGuestLoader(false);
         }
-        else if (status === 'failed') {
-            setMessage(response)
-            setShowPopup(true)
-            setLoader(false)
-        }
-        else if (status === 'error') {
-            setMessage("Network Error")
-            setShowPopup(true)
-            setLoader(false)
-            setGuestLoader(false)
-        }
-    }, [status, currentRole, navigate, error, response, currentUser]);
+    }, [status, currentRole, navigate, response, currentUser]);
 
     return (
-        <ThemeProvider theme={defaultTheme}>
-            <Grid container component="main" sx={{ height: '100vh' }}>
+        <ThemeProvider theme={theme}>
+            <Grid container component="main" sx={{ height: '100vh', background: 'linear-gradient(135deg, #f0f4f8, #d9e8ff)' }}>
                 <CssBaseline />
-                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                    <Box
-                        sx={{
-                            my: 8,
-                            mx: 4,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Typography variant="h4" sx={{ mb: 2, color: "#2c2143" }}>
+                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Box sx={{ width: '100%', maxWidth: 400, p: 4 }}>
+                        <Typography variant="h4" align="center" gutterBottom>
                             {role} Login
                         </Typography>
-                        <Typography variant="h7">
-                            Welcome back! Please enter your details
+                        <Typography variant="body1" align="center" sx={{ mb: 3 }}>
+                            Welcome back! Please enter your details.
                         </Typography>
                         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 2 }}>
                             {role === "Student" ? (
                                 <>
                                     <TextField
                                         margin="normal"
-                                        required
                                         fullWidth
                                         id="rollNumber"
                                         label="Enter your Roll Number"
                                         name="rollNumber"
-                                        autoComplete="off"
                                         type="number"
-                                        autoFocus
                                         error={rollNumberError}
                                         helperText={rollNumberError && 'Roll Number is required'}
-                                        onChange={handleInputChange}
+                                        onChange={() => setRollNumberError(false)}
                                     />
                                     <TextField
                                         margin="normal"
-                                        required
                                         fullWidth
                                         id="studentName"
                                         label="Enter your name"
                                         name="studentName"
-                                        autoComplete="name"
-                                        autoFocus
                                         error={studentNameError}
                                         helperText={studentNameError && 'Name is required'}
-                                        onChange={handleInputChange}
+                                        onChange={() => setStudentNameError(false)}
                                     />
                                 </>
                             ) : (
                                 <TextField
                                     margin="normal"
-                                    required
                                     fullWidth
                                     id="email"
                                     label="Enter your email"
                                     name="email"
-                                    autoComplete="email"
-                                    autoFocus
                                     error={emailError}
                                     helperText={emailError && 'Email is required'}
-                                    onChange={handleInputChange}
+                                    onChange={() => setEmailError(false)}
                                 />
                             )}
                             <TextField
                                 margin="normal"
-                                required
                                 fullWidth
                                 name="password"
                                 label="Password"
                                 type={toggle ? 'text' : 'password'}
                                 id="password"
-                                autoComplete="current-password"
                                 error={passwordError}
                                 helperText={passwordError && 'Password is required'}
-                                onChange={handleInputChange}
+                                onChange={() => setPasswordError(false)}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
                                             <IconButton onClick={() => setToggle(!toggle)}>
-                                                {toggle ? (
-                                                    <Visibility />
-                                                ) : (
-                                                    <VisibilityOff />
-                                                )}
+                                                {toggle ? <Visibility /> : <VisibilityOff />}
                                             </IconButton>
                                         </InputAdornment>
                                     ),
                                 }}
                             />
-                            <Grid container sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Grid container justifyContent="space-between" sx={{ mt: 1 }}>
                                 <FormControlLabel
-                                    control={<Checkbox value="remember" color="primary" />}
+                                    control={<Checkbox color="primary" />}
                                     label="Remember me"
                                 />
-                                <StyledLink href="#">
+                                <StyledLink to="#" style={{ color: '#007bff', fontSize: '0.9rem' }}>
                                     Forgot password?
                                 </StyledLink>
                             </Grid>
-                            <LightPurpleButton
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                sx={{ mt: 3 }}
-                            >
-                                {loader ?
-                                    <CircularProgress size={24} color="inherit" />
-                                    : "Login"}
-                            </LightPurpleButton>
+                            <PrimaryButton type="submit" variant="outlined" fullWidth sx={{ mt: 2, borderColor: '#007bff' }}>
+                                {loader ? <CircularProgress size={24} color="inherit" /> : "Login"}
+                            </PrimaryButton>
                             <Button
                                 fullWidth
                                 onClick={guestModeHandler}
                                 variant="outlined"
-                                sx={{ mt: 2, mb: 3, color: "#7f56da", borderColor: "#7f56da" }}
+                                sx={{ mt: 2, color: '#007bff' }}
                             >
-                                Login as Guest
+                                {guestLoader ? <CircularProgress size={24} color="primary" /> : "Login as Guest"}
                             </Button>
-                            {role === "Admin" &&
-                                <Grid container>
-                                    <Grid>
-                                        Don't have an account?
-                                    </Grid>
-                                    <Grid item sx={{ ml: 2 }}>
-                                        <StyledLink to="/Adminregister">
-                                            Sign up
-                                        </StyledLink>
-                                    </Grid>
+                            {role === "Admin" && (
+                                <Grid container justifyContent="center" sx={{ mt: 3 }}>
+                                    <Typography variant="body2" sx={{ mr: 1 }}>
+                                        Don’t have an account?
+                                    </Typography>
+                                    <StyledLink to="/Adminregister">
+                                        Sign up
+                                    </StyledLink>
                                 </Grid>
-                            }
+                            )}
                         </Box>
                     </Box>
                 </Grid>
@@ -264,29 +209,31 @@ const LoginPage = ({ role }) => {
                     sx={{
                         backgroundImage: `url(${bgpic})`,
                         backgroundRepeat: 'no-repeat',
-                        backgroundColor: (t) =>
-                            t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                     }}
                 />
             </Grid>
-            <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={guestLoader}
-            >
-                <CircularProgress color="primary" />
-                Please Wait
+            <Backdrop open={guestLoader} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                <CircularProgress color="inherit" />
             </Backdrop>
             <Popup message={message} setShowPopup={setShowPopup} showPopup={showPopup} />
         </ThemeProvider>
     );
 }
 
-export default LoginPage
+export default LoginPage;
 
 const StyledLink = styled(Link)`
-  margin-top: 9px;
-  text-decoration: none;
-  color: #7f56da;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+`;
+
+const PrimaryButton = styled(Button)`
+    background-color: #007bff;
+    color: #fff;
+    &:hover {
+        background-color: #0056b3;
+    }
 `;

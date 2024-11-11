@@ -6,7 +6,6 @@ import styled from 'styled-components';
 
 const Logout = () => {
     const currentUser = useSelector(state => state.user.currentUser);
-
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -20,54 +19,96 @@ const Logout = () => {
     };
 
     return (
-        <LogoutContainer>
-            <h1>{currentUser.name}</h1>
-            <LogoutMessage>Are you sure you want to log out?</LogoutMessage>
-            <LogoutButtonLogout onClick={handleLogout}>Log Out</LogoutButtonLogout>
-            <LogoutButtonCancel onClick={handleCancel}>Cancel</LogoutButtonCancel>
-        </LogoutContainer>
+        <PageContainer>
+            <LogoutContainer>
+                <UserName>{currentUser.name}</UserName>
+                <LogoutMessage>Are you sure you want to log out?</LogoutMessage>
+                <ButtonContainer>
+                    <LogoutButton onClick={handleLogout}>Log Out</LogoutButton>
+                    <CancelButton onClick={handleCancel}>Cancel</CancelButton>
+                </ButtonContainer>
+            </LogoutContainer>
+        </PageContainer>
     );
 };
 
 export default Logout;
 
+// Styled Components
+
+const PageContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+`;
+
 const LogoutContainer = styled.div`
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-  background-color: #85769f66;
-  color: black;
+  justify-content: center;
+  max-width: 500px;
+  width: 100%;
+  margin: auto;
+  padding: 3rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+`;
+
+const UserName = styled.h1`
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #007bff;
+  margin-bottom: 1.5rem;
 `;
 
 const LogoutMessage = styled.p`
-  margin-bottom: 20px;
-  font-size: 16px;
-  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 2rem;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
 `;
 
 const LogoutButton = styled.button`
-  padding: 10px 20px;
-  margin-top: 10px;
-  border-radius: 5px;
-  font-size: 16px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
   color: #fff;
+  background-color: #ea0606;
   cursor: pointer;
+  transition: background-color 0.3s;
 
   &:hover {
-    color: #fff;
-    background-color: #333;
+    background-color: #c10505;
   }
 `;
 
-const LogoutButtonLogout = styled(LogoutButton)`
-  background-color: #ea0606;
-`;
+const CancelButton = styled.button`
+  padding: 14px 28px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #007bff;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.3s;
 
-const LogoutButtonCancel = styled(LogoutButton)`
-  background-color: rgb(99, 60, 99);
+  &:hover {
+    background-color: #e6f2ff;
+  }
 `;
