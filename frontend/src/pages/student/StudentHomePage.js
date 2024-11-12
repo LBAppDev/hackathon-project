@@ -2,116 +2,114 @@ import React, { useEffect, useState } from 'react';
 import { Container, Grid, Paper, Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { calculateOverallAttendancePercentage } from '../../components/attendanceCalculator';
-import CustomPieChart from '../../components/CustomPieChart';
 import { getUserDetails } from '../../redux/userRelated/userHandle';
+import { getSubjectList } from '../../redux/sclassRelated/sclassHandle';
 import styled from 'styled-components';
 import SeeNotice from '../../components/SeeNotice';
 import CountUp from 'react-countup';
-import SubjectIcon from "../../assets/subjects.svg";
-import AssignmentIcon from "../../assets/assignment.svg";
-import { getSubjectList } from '../../redux/sclassRelated/sclassHandle';
+import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, Legend } from 'recharts';
+import { useSpring, animated } from 'react-spring';
+import Skeleton from '@mui/material/Skeleton';
+
+const COLORS = ['#0088FE', '#FF8042'];
+const dataSample = [
+  { name: 'Assignment 1', score: 75 },
+  { name: 'Assignment 2', score: 89 },
+  { name: 'Assignment 3', score: 92 }
+];
 
 const StudentHomePage = () => {
-    const dispatch = useDispatch();
-    const { userDetails, currentUser, loading, response } = useSelector(state => state.user);
-    const { subjectsList } = useSelector(state => state.sclass);
-    const [subjectAttendance, setSubjectAttendance] = useState([]);
+  const dispatch = useDispatch();
+  const { userDetails, currentUser, loading, response } = useSelector(state => state.user);
+  const { subjectsList } = useSelector(state => state.sclass);
+  const [subjectAttendance, setSubjectAttendance] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
 
-    const classID = currentUser.sclassName._id;
-    const numberOfSubjects = subjectsList?.length || 0;
-    const overallAttendancePercentage = calculateOverallAttendancePercentage(subjectAttendance);
-    const overallAbsentPercentage = 100 - overallAttendancePercentage;
+  const classID = currentUser?.sclassName?._id;
+  const overallAttendancePercentage = calculateOverallAttendancePercentage(subjectAttendance);
+  const chartData = [
+    { name: 'Present', value: overallAttendancePercentage },
+    { name: 'Absent', value: 100 - overallAttendancePercentage }
+  ];
 
-    const chartData = [
-        { name: 'Present', value: overallAttendancePercentage },
-        { name: 'Absent', value: overallAbsentPercentage }
-    ];
+  useEffect(() => {
+    dispatch(getUserDetails(currentUser._id, "Student"));
+    dispatch(getSubjectList(classID, "ClassSubjects"));
+    setTimeout(() => setLoadingData(false), 2000); // Simulating loading
+  }, [dispatch, currentUser._id, classID]);
 
-    useEffect(() => {
-        dispatch(getUserDetails(currentUser._id, "Student"));
-        dispatch(getSubjectList(classID, "ClassSubjects"));
-    }, [dispatch, currentUser._id, classID]);
+  useEffect(() => {
+    setSubjectAttendance(userDetails?.attendance || []);
+  }, [userDetails]);
 
-    useEffect(() => {
-        setSubjectAttendance(userDetails?.attendance || []);
-    }, [userDetails]);
+  const springProps = useSpring({
+    opacity: loadingData ? 0 : 1,
+    transform: loadingData ? 'scale(0.9)' : 'scale(1)'
+  });
 
-    return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={3}>
-                    <StyledPaper>
-                        <img src={SubjectIcon} alt="Subjects" />
-                        <Title>Total Subjects</Title>
-                        <Data start={0} end={numberOfSubjects} duration={2.5} />
-                    </StyledPaper>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                    <StyledPaper>
-                        <img src={AssignmentIcon} alt="Assignments" />
-                        <Title>Total Assignments</Title>
-                        <Data start={0} end={15} duration={4} />
-                    </StyledPaper>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                    <StyledPaper>
-                        <Typography variant="h6">Progress</Typography> {/* Added title for the pie chart */}
-                        {response ? (
-                            <Typography variant="h6">No Attendance Found</Typography>
-                        ) : (
-                            loading ? (
-                                <Typography variant="h6">Loading...</Typography>
-                            ) : (
-                                subjectAttendance?.length > 0 ? (
-                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <CustomPieChart data={chartData} />
-                                    </div>
-                                ) : (
-                                    <Typography variant="h6">No Attendance Found</Typography>
-                                )
-                            )
-                        )}
-                    </StyledPaper>
-                </Grid>
-                <Grid item xs={12}>
-                    <DynamicHeightPaper>
-                        <SeeNotice />
-                    </DynamicHeightPaper>
-                </Grid>
-            </Grid>
-        </Container>
-    );
-}
+  return (
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={4}>
+          <StyledPaper>
+            <Typography variant="h6">Overall Attendance</Typography>
+            {loadingData ? (
+              <Skeleton variant="rectangular" height={100} />
+            ) : (
+              <PieChart width={150} height={150}>
+                <Pie data={chartData} dataKey="value" outerRadius={60} fill="#8884d8">
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            )}
+          </StyledPaper>
+        </Grid>
+        
+        <Grid item xs={12} sm={6} md={8}>
+          <StyledPaper>
+            <Typography variant="h6">Assignment Scores</Typography>
+            {loadingData ? (
+              <Skeleton variant="rectangular" height={150} />
+            ) : (
+              <BarChart width={300} height={150} data={dataSample}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="score" fill="#0088FE" />
+              </BarChart>
+            )}
+          </StyledPaper>
+        </Grid>
 
-const baseContainerStyle = `
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-`;
+        <Grid item xs={12}>
+          <DynamicHeightPaper>
+            <animated.div style={springProps}>
+              <SeeNotice />
+            </animated.div>
+          </DynamicHeightPaper>
+        </Grid>
+      </Grid>
+    </Container>
+  );
+};
 
 const StyledPaper = styled(Paper)`
-  ${baseContainerStyle}
   padding: 16px;
-  height: 200px;
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 `;
 
 const DynamicHeightPaper = styled(Paper)`
-  ${baseContainerStyle}
   padding: 16px;
+  width: 100%;
   box-sizing: border-box;
-  height: auto; /* Makes the notice table card height dynamic */
-`;
-
-const Title = styled.p`
-  font-size: 1.25rem;
-`;
-
-const Data = styled(CountUp)`
-  font-size: calc(1.3rem + 0.6vw);
-  color: green;
 `;
 
 export default StudentHomePage;

@@ -100,75 +100,90 @@ const DashboardContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  background-color: #f0f2f5;
-  border-radius: 8px;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-  max-width: 500px;
-  margin: 0 auto;
+  padding: 30px;
+  background: linear-gradient(135deg, #ece9e6, #ffffff);
+  border-radius: 15px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  margin: 50px auto;
 `;
 
 const Title = styled.h2`
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 10px;
+  font-size: 28px;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-family: 'Poppins', sans-serif;
 `;
 
 const Instruction = styled.p`
   font-size: 16px;
-  color: #555;
-  margin-bottom: 20px;
+  color: #34495e;
+  margin-bottom: 25px;
   text-align: center;
+  font-family: 'Roboto', sans-serif;
 `;
 
 const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
   width: 100%;
-  max-width: 400px;
-  margin-bottom: 20px;
+  max-width: 450px;
+  margin-bottom: 25px;
 `;
 
 const StyledInput = styled.input`
-  padding: 10px;
+  padding: 12px;
   font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 2px solid #bdc3c7;
+  border-radius: 10px;
   width: 100%;
   box-sizing: border-box;
+  background-color: #fdfdfd;
+  transition: border-color 0.3s;
+
+  &:focus {
+    outline: none;
+    border-color: #3498db;
+  }
 `;
 
 const StyledButton = styled.button`
-  padding: 10px;
-  font-size: 16px;
-  background-color: #4caf50;
-  color: #fff;
+  padding: 12px;
+  font-size: 18px;
+  background-color: #2980b9;
+  color: #ffffff;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-family: 'Poppins', sans-serif;
+  transition: background-color 0.3s, transform 0.2s;
 
   &:hover {
-    background-color: #45a049;
+    background-color: #1f618d;
+    transform: translateY(-3px);
   }
 `;
 
 const QRCodeContainer = styled.div`
-  width: 300px;
-  height: 300px;
-  margin-top: 20px;
+  width: 320px;
+  height: 320px;
+  margin-top: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px dashed #3498db;
+  border-radius: 10px;
+  background-color: #f9f9f9;
 `;
 
 const SuccessMessage = styled.div`
-  color: #4caf50;
+  color: #27ae60;
   font-weight: bold;
   text-align: center;
-  padding: 10px;
-  border: 1px solid #4caf50;
-  border-radius: 5px;
-  background-color: #e8f5e9;
+  padding: 12px;
+  border: 2px solid #27ae60;
+  border-radius: 10px;
+  background-color: #eafaf1;
+  font-family: 'Roboto', sans-serif;
 `;

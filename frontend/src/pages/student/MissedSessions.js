@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Box, Typography } from '@mui/material';
+import { CheckCircle, ReportProblem } from '@mui/icons-material';
 import axios from 'axios';
 
 const baseURL = 'http://localhost:5000/api';
@@ -40,7 +41,6 @@ const MissedSessions = ({ userRole }) => {
         try {
             const reportData = {
                 ...form,
-                // No studentId included here, as per your request
             };
             const response = await axios.post('/report-missed-session', reportData);
             if (response.status === 200) {
@@ -62,7 +62,6 @@ const MissedSessions = ({ userRole }) => {
             alert('Error reporting missed session. Check the console for details.');
         }
     };
-    
 
     // Mark a session as recovered
     const handleRecoverSession = async (sessionId) => {
@@ -81,46 +80,48 @@ const MissedSessions = ({ userRole }) => {
     return (
         <>
             {userRole === 'student' && (
-                <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4 }}>
-                    <TextField label="Teacher Name" name="teacherName" value={form.teacherName} onChange={handleInputChange} />
-                    <TextField label="Subject Name" name="subjectName" value={form.subjectName} onChange={handleInputChange} />
-                    <TextField label="Class Name" name="className" value={form.className} onChange={handleInputChange} />
-                    <TextField label="Date" name="date" type="date" value={form.date} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
-                    <TextField label="Start Time" name="startTime" type="time" value={form.startTime} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
-                    <TextField label="End Time" name="endTime" type="time" value={form.endTime} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
-                    <Button onClick={handleReportSession} variant="contained" color="primary">
+                <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4, p: 2, border: '1px solid #ddd', borderRadius: 2, backgroundColor: '#f9f9f9' }}>
+                    <Typography variant="h6" color="primary" gutterBottom>Report a Missed Session</Typography>
+                    <TextField size="small" label="Teacher Name" name="teacherName" value={form.teacherName} onChange={handleInputChange} />
+                    <TextField size="small" label="Subject Name" name="subjectName" value={form.subjectName} onChange={handleInputChange} />
+                    <TextField size="small" label="Class Name" name="className" value={form.className} onChange={handleInputChange} />
+                    <TextField size="small" label="Date" name="date" type="date" value={form.date} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
+                    <TextField size="small" label="Start Time" name="startTime" type="time" value={form.startTime} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
+                    <TextField size="small" label="End Time" name="endTime" type="time" value={form.endTime} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
+                    <Button onClick={handleReportSession} variant="contained" color="secondary" startIcon={<ReportProblem />} sx={{ mt: 2 }}>
                         Report Missed Session
                     </Button>
                 </Box>
             )}
 
-            <TableContainer component={Paper}>
+            <Typography variant="h5" gutterBottom>Missed Sessions</Typography>
+            <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2 }}>
                 <Table>
-                    <TableHead>
+                    <TableHead sx={{ backgroundColor: '#eceff1' }}>
                         <TableRow>
-                            <TableCell>Teacher Name</TableCell>
-                            <TableCell>Subject Name</TableCell>
-                            <TableCell>Class Name</TableCell>
-                            <TableCell>Date</TableCell>
-                            <TableCell>Start Time</TableCell>
-                            <TableCell>End Time</TableCell>
-                            <TableCell>Recovered</TableCell>
-                            {userRole === 'student' && <TableCell>Actions</TableCell>}
+                            <TableCell><strong>Teacher Name</strong></TableCell>
+                            <TableCell><strong>Subject Name</strong></TableCell>
+                            <TableCell><strong>Class Name</strong></TableCell>
+                            <TableCell><strong>Date</strong></TableCell>
+                            <TableCell><strong>Start Time</strong></TableCell>
+                            <TableCell><strong>End Time</strong></TableCell>
+                            <TableCell><strong>Recovered</strong></TableCell>
+                            {userRole === 'student' && <TableCell><strong>Actions</strong></TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {sessions.map((session) => (
-                            <TableRow key={session._id}>
+                            <TableRow key={session._id} hover>
                                 <TableCell>{session.teacherName}</TableCell>
                                 <TableCell>{session.subjectName}</TableCell>
                                 <TableCell>{session.className}</TableCell>
                                 <TableCell>{new Date(session.date).toLocaleDateString()}</TableCell>
                                 <TableCell>{session.startTime}</TableCell>
                                 <TableCell>{session.endTime}</TableCell>
-                                <TableCell>{session.isRecovered ? 'Yes' : 'No'}</TableCell>
+                                <TableCell>{session.isRecovered ? <CheckCircle color="success" /> : 'No'}</TableCell>
                                 {userRole === 'student' && !session.isRecovered && (
                                     <TableCell>
-                                        <Button onClick={() => handleRecoverSession(session._id)} variant="contained" color="primary">
+                                        <Button onClick={() => handleRecoverSession(session._id)} variant="contained" color="success" sx={{ fontWeight: 'bold' }}>
                                             Mark as Recovered
                                         </Button>
                                     </TableCell>
