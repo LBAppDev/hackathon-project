@@ -10,6 +10,7 @@ import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import { useSelector } from 'react-redux';
 import { ListItem } from '@mui/material';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const TeacherSideBar = () => {
     const { currentUser } = useSelector((state) => state.user);
@@ -43,13 +44,11 @@ const TeacherSideBar = () => {
                     </ListItemIcon>
                     <ListItemText primary="Missed Sessions" />
                 </ListItem>
-                <ListItemButton component={Link} to="/Teacher/update-session">
-                    <ListItemIcon>
-                    <EventBusyIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Update Session" />
-                </ListItemButton>
+                
                 <ListItemButton component={Link} to="/Teacher/attendance">
+                    <ListItemIcon>
+                        <CheckCircleIcon />
+                    </ListItemIcon>
                     <ListItemText primary="Take Attendance" />
                 </ListItemButton>
             </React.Fragment>

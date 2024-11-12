@@ -1,47 +1,81 @@
-import React, { useState } from 'react';
-import { QRCodeCanvas } from 'qrcode.react'; // Import QRCodeCanvas
-import QRScanner from 'react-qr-scanner';
+import React, { useEffect, useState } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 import axios from 'axios';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';  // Import useSelector
 
 const TeacherTakeAttendance = () => {
-  const [qrValue, setQrValue] = useState(''); // State for QR value
-  const [scannedId, setScannedId] = useState(''); // State for scanned ID
-  const [subCode, setSubCode] = useState(''); // State for subject code
+  // Access currentUser from Redux store to get classID
+  const { currentUser } = useSelector((state) => state.user);
+  console.log(currentUser.teachSubject.subName);
+  const name = currentUser.teachSubject.subName;
+  const classID = currentUser.teachSclass?._id
+  const [qrValue, setQrValue] = useState('');
+  const [scannedId, setScannedId] = useState('');
+  const [subCode, setSubCode] = useState('');
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState('');
 
-  const startAttendance = () => {
-    const uniqueCode = `attendance-${new Date().getTime()}`; // Generate a unique code
-    setQrValue(uniqueCode); // Set QR code value
-    // Save the code and subject code to the server
-    axios.post('/attendanceSessions', { code: uniqueCode, subCode: subCode });
+  // Fetch subjects based on classID
+  useEffect(() => {
+    if (classID) {
+      const fetchSubjects = async () => {
+        try {
+          const response = await axios.get(`/AllSubjects/${classID}`);
+          console.log('Fetched subjects:', response.data); // Log the fetched subjects
+          setSubjects(Array.isArray(response.data) ? response.data : []); // Ensure it's an array
+        } catch (error) {
+          console.error("Failed to fetch subjects:", error);
+        }
+      };
+      fetchSubjects();
+    }
+  }, [classID]); // Dependency array ensures it runs when classID changes
+
+  const handleSubjectChange = (event) => {
+    const selectedSub = event.target.value;
+    setSelectedSubject(selectedSub);
+
+    const subject = subjects.find((sub) => sub.name === selectedSub);
+    setSubCode(subject ? subject.code : '');
   };
 
-  const handleScan = (data) => {
-    if (data) {
-      setScannedId(data); // Set scanned ID
+  const startAttendance = async () => {
+    const uniqueCode = `attendance-${new Date().getTime()}`;
+    setQrValue(uniqueCode);
+    
+    const code = await axios.get(`/getSubCode/${name}`);
+    console.log(code.data.subCode);
+    try {
+      await axios.post('/attendanceSessions', { code: uniqueCode, subCode: code.data.subCode });
+      await axios.put(`/subjects/${code.data.subCode}/session`, { increment: 1 });
+
+      alert("Attendance started, and session count updated!");
+    } catch (error) {
+      console.error("Error starting attendance:", error);
+      alert("Failed to start attendance or update session count.");
     }
   };
 
+  const handleScan = (data) => {
+    if (data) setScannedId(data);
+  };
+
   const handleError = (err) => {
-    console.error(err); // Log any errors from QRScanner
+    console.error(err);
   };
 
   return (
     <Container>
       <Title>Teacher Dashboard</Title>
-      <Button onClick={startAttendance}>Start Taking Attendance</Button>
-      <Input
-        type="text"
-        placeholder="Enter Subject Code"
-        value={subCode}
-        onChange={(e) => setSubCode(e.target.value)}
-      />
+      
+      <Button onClick={startAttendance} >Start Taking Attendance</Button>
+
       {qrValue && (
         <QRCodeContainer>
           <QRCodeCanvas value={qrValue} />
         </QRCodeContainer>
       )}
-      
       {scannedId && <StudentID>Student ID: {scannedId}</StudentID>}
     </Container>
   );
@@ -53,7 +87,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 20px;
   background-color: #f0f2f5;
   border-radius: 8px;
@@ -77,13 +110,19 @@ const Button = styled.button`
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 20px;
 
   &:hover {
     background-color: #45a049;
   }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 `;
 
-const Input = styled.input`
+const Select = styled.select`
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ddd;
@@ -98,19 +137,8 @@ const QRCodeContainer = styled.div`
   margin-top: 20px;
   display: flex;
   justify-content: center;
-  align-items: center;
   width: 300px;
   height: 300px;
-`;
-
-const ScannerContainer = styled.div`
-  width: 300px;
-  height: 300px;
-  margin-top: 20px;
-  border: 2px dashed #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 const StudentID = styled.p`

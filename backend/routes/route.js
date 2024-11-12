@@ -22,7 +22,7 @@ const {
     clearAllStudentsAttendance,
     removeStudentAttendanceBySubject,
     removeStudentAttendance } = require('../controllers/student_controller.js');
-const { subjectCreate, classSubjects, deleteSubjectsByClass, getSubjectDetail, deleteSubject, freeSubjectList, allSubjects, deleteSubjects, updateCurrentSession } = require('../controllers/subject-controller.js');
+const { subjectCreate, classSubjects, deleteSubjectsByClass, getSubjectDetail, deleteSubject, freeSubjectList, allSubjects, deleteSubjects, updateCurrentSession, getSubCodeBySubName } = require('../controllers/subject-controller.js');
 const { teacherRegister, teacherLogIn, getTeachers, getTeacherDetail, deleteTeachers, deleteTeachersByClass, deleteTeacher, updateTeacherSubject, teacherAttendance } = require('../controllers/teacher-controller.js');
 
 // Admin
@@ -106,12 +106,25 @@ router.delete("/Sclass/:id", deleteSclass)
 // Subject
 
 router.post('/SubjectCreate', subjectCreate);
-router.put('/subjects/:id/session', updateCurrentSession);
+router.put('/subjects/:subCode/session', updateCurrentSession);
 
 router.get('/AllSubjects/:id', allSubjects);
 router.get('/ClassSubjects/:id', classSubjects);
 router.get('/FreeSubjectList/:id', freeSubjectList);
 router.get("/Subject/:id", getSubjectDetail)
+
+router.get('/getSubCode/:subName', async (req, res) => {
+  try {
+    console.log(req.params.subName);
+      const subName = req.params.subName;  // Get subName from the route parameter
+      const subCode = await getSubCodeBySubName(subName);  // Call the controller function
+
+      // Send the subCode in the response
+      res.json({ subCode });
+  } catch (error) {
+      res.status(500).json({ message: error.message });  // Handle errors
+  }
+});
 
 router.delete("/Subject/:id", deleteSubject)
 router.delete("/Subjects/:id", deleteSubjects)

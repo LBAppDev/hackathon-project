@@ -162,7 +162,7 @@ const deleteSubjectsByClass = async (req, res) => {
     }
 };
 
-const updateCurrentSession = async (req, res) => {
+/*const updateCurrentSession = async (req, res) => {
     try {
         const { id } = req.params;
         const { current_session } = req.body;
@@ -183,8 +183,49 @@ const updateCurrentSession = async (req, res) => {
         console.error("Error updating session:", error);
         res.status(500).json({ message: 'Error updating session', error });
     }
+};*/
+
+const updateCurrentSession = async (req, res) => {
+    try {
+        const { subCode } = req.params;  // Use subCode from URL params
+        const { increment } = req.body;  // Get increment from body
+
+        console.log("Received subCode:", subCode);
+        console.log("Received increment:", increment);
+
+        // Find the subject by subCode and increment the current_session
+        const subject = await Subject.findOneAndUpdate(
+            { subCode: subCode },  // Find the subject by subCode
+            { $inc: { current_session: increment } },  // Increment the current_session
+            { new: true }  // Return the updated subject
+        );
+
+        console.log("Updated subject:", subject);
+        res.status(200).json(subject);  // Send the updated subject as a response
+    } catch (error) {
+        console.error("Error updating session:", error);
+        res.status(500).json({ message: 'Error updating session', error });
+    }
+};
+
+const getSubCodeBySubName = async (subName) => {
+    try {
+        // Find the subject by subName
+        const subject = await Subject.findOne({ subName: subName });
+
+        // Check if subject exists
+        if (!subject) {
+            throw new Error('Subject not found');
+        }
+
+        // Return the subCode
+        return subject.subCode;
+    } catch (error) {
+        console.error('Error getting subCode:', error);
+        throw error;
+    }
 };
 
 
 
-module.exports = { subjectCreate, freeSubjectList, classSubjects, getSubjectDetail, deleteSubjectsByClass, deleteSubjects, deleteSubject, allSubjects, updateCurrentSession };
+module.exports = { subjectCreate, freeSubjectList, classSubjects, getSubjectDetail, deleteSubjectsByClass, deleteSubjects, deleteSubject, allSubjects, updateCurrentSession, getSubCodeBySubName };
